@@ -159,6 +159,7 @@ module.exports = async () => {
                 });
 
                 if(user) {
+                    console.log("user.room", user.room);
                     socket.join(user.room);
                     socket.emit('welcome', {
                         user: 'bot',
@@ -185,7 +186,7 @@ module.exports = async () => {
           const user = await userExists(data.user.id);
           if(user) {
               console.log("user.room", data);
-              io.to(user.room).emit('message', {
+              io.emit('message', {
                   user: user.username,
                   text: data.message,
               });

@@ -2,7 +2,9 @@
     <div>
         <h1>Welcome in Chat Room {{user.username}}</h1>
         <div id="messages" style="height: 80vh; width: 500px; background-color: azure;">
-
+            <div class="messages" v-for="(msg, index) in messages" :key="index">
+                <p><span class="font-weight-bold">{{ msg.user }}: </span>{{ msg.text }}</p>
+            </div>
         </div>
         <div>
             <input v-model="messageToSend" type="text">
@@ -30,17 +32,17 @@ export default {
         });
     },
     computed:{
-        ...mapState(['user', 'message'])
+        ...mapState(['user'])
     },
 
     methods:{
         sendMessage(){
             if (this.messageToSend) {
-
                 this.socket.emit('sendMessage', {
                     user: this.user,
                     message: this.messageToSend
                 });
+                this.messageToSend = '';
             }
         }
     }
