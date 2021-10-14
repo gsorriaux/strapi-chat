@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import io from 'socket.io-client';
 import { mapMutations } from 'vuex'
 export default {
     name: "chat-join",
@@ -32,41 +31,22 @@ export default {
         return {
             username: '',
             room: '',
-            messages: [],
-            socket : io('localhost:1337')
         }
     },
-    mounted() {
-        this.socket.on('welcome', (data) => {
-            console.log(data);
-            this.addUser(data);
-            this.$router.push(`/chat/rooms/${data.userData.room}`)
-        });
-    },
     methods: {
-        sendMessage(e) {
-            e.preventDefault();
-        },
         joinRoom(){
-            console.log(this.username, this.room);
             let username = this.username;
             let room = this.room;
             if(username && room) {
-                this.socket.emit('join', { username, room }, (error) => {
-                    if(error) {
-                        console.log(error);
-                    } else {
-                        this.socket.on('welcome', (data) => {
-                            console.log(data);
-                            this.$router.push(`/chat/rooms/${data.userData.romm}`)
-                        });
-                    }
-                }); 
+                this.addLoginUser({
+                    username,
+                    room
+                });
+                this.$router.push(`/chat/rooms/${room}`)
             }
         },
-        addUser(data){
-            this.$store.commit("addUser", data.userData);
-            console.log(this.$store);
+        addLoginUser(data){
+            this.$store.commit("addUser", data);
         },
         ...mapMutations['addUser'],
         

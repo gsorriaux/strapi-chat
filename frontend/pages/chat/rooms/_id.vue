@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import io from 'socket.io-client';
 export default {
     name: "chat-room",
@@ -26,9 +26,18 @@ export default {
         }
     },
     mounted(){
-        this.socket.on('message', (data) => {
-            console.log(data);
-            this.messages = [...this.messages, data];
+        const username = this.user.username;
+        const room = this.user.room;
+        this.socket.emit('join', { username, room }, (error) => {
+            if(error) {
+                console.log(error);
+            }
+        }); 
+        this.socket.on('welcome', (data) => {
+            this.addUserInRoom(data);
+        });
+        this.socket.on('message', (message) => {
+            this.messages = [...this.messages, message];
         });
     },
     computed:{
@@ -44,7 +53,11 @@ export default {
                 });
                 this.messageToSend = '';
             }
-        }
+        },
+        addUserInRoom(data){
+            this.$store.commit("addUser", data);
+        },
+        ...mapMutations['addUser'],
     }
 }
 </script>

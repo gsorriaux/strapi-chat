@@ -183,10 +183,9 @@ module.exports = async () => {
     socket.on('sendMessage', async(data) => {
       try {
           console.log(data);
-          const user = await userExists(data.user.id);
+          const user = await userExists(data.user.userData.id);
           if(user) {
-              console.log("user.room", data);
-              io.emit('message', {
+              io.to(user.room).emit('message', {
                   user: user.username,
                   text: data.message,
               });

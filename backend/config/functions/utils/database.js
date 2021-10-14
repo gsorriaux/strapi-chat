@@ -1,10 +1,4 @@
 async function findChatuser(username, room) {
-    // try {
-    //     const userExists = await strapi.services.users.find({ username, room });
-    //     return userExists;
-    // } catch(err) {
-    //     console.log("error while fetching", err);
-    // }
     console.log(username, room);
     const userExists = async () => {
         const result = await strapi
