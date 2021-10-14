@@ -6,7 +6,9 @@ const path = require("path");
 const {
   findChatuser, 
   createChatuser,
-  userExists
+  userExists,
+  getUsersInRoom,
+  deleteUser
 } = require('./utils/database');
 
 const {
@@ -170,6 +172,10 @@ module.exports = async () => {
                         user: 'bot',
                         text: `${user.username} has joined`,
                     });
+                    io.to(user.room).emit('roomInfo', {
+                      room: user.room,
+                      users: await getUsersInRoom(user.room)
+                    });
 
                 } else {
                     callback(`user could not be created. Try again!`)
@@ -189,10 +195,38 @@ module.exports = async () => {
                   user: user.username,
                   text: data.message,
               });
+
+              io.to(user.room).emit('roomInfo', {
+                room: user.room,
+                users: await getUsersInRoom(user.room)
+              });
           }
       } catch(err) {
           console.log("err inside catch block", err);
       }
     });
+
+    socket.on('disconnect', async(data) => {
+      try {
+          console.log("DISCONNECTED!!!!!!!!!!!!");
+          console.log(socket);
+          const user = await deleteUser( socket.id);
+          console.log("deleted user is", user)
+          if(user.length > 0) {
+              io.to(user[0].room).emit('message', {
+                  user: user[0].username,
+                  text: `User ${user[0].username} has left the chat.`,
+              });  
+              io.to(user.room).emit('roomInfo', {
+                room: user.room,
+                users: await getUsersInRoom(user.room)
+              });
+          }
+      } catch(err) {
+          console.log("error while disconnecting", err);
+      }
+});
+
+    
   });
 };

@@ -38,8 +38,32 @@ async function userExists(id) {
     }
 }
 
+async function getUsersInRoom(room) {
+    try {
+        const usersInRoom = await strapi
+        .query("chatusers")
+        .find({ room })
+        return usersInRoom;
+    } catch(err) {
+        console.log("Error.Try again!", err);
+    }
+}
+
+async function deleteUser(socketid) {
+    try {
+        const user = await strapi
+        .query("chatusers")
+        .delete({socketid})
+        return user;
+    } catch(err) {
+        console.log("Error while deleting the User", err);
+    }
+}
+
 module.exports = {
     findChatuser,
     createChatuser,
-    userExists
+    userExists,
+    getUsersInRoom,
+    deleteUser
 }
